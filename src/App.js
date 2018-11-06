@@ -3,11 +3,14 @@ import axios from 'axios';
 import 'semantic-ui-css/semantic.min.css';
 import _ from "lodash";
 import Chart from "react-google-charts";
-import Control from 'react-leaflet-control';
-import { Map, Marker, Popup, TileLayer, ZoomControl, ScaleControl } from 'react-leaflet';
+import ReactMapboxGl, { Layer, Feature, ZoomControl } from "react-mapbox-gl";
+import Icon from "./form.png";
 
 
 const TOKEN="pk.eyJ1IjoiemFmZmEiLCJhIjoiY2pvMGRyZHhwMHR1bTNxbGpuMzMwMWJ5eSJ9.-evEOb2m5B3LftZjo9KziA";
+const Map = ReactMapboxGl({
+    accessToken: "pk.eyJ1IjoiemFmZmEiLCJhIjoiY2pvMGRyZHhwMHR1bTNxbGpuMzMwMWJ5eSJ9.-evEOb2m5B3LftZjo9KziA"
+});
 
 export default class PersonList extends React.Component {
     constructor(props) {
@@ -19,16 +22,30 @@ export default class PersonList extends React.Component {
             all: null,
             data: null,
             mapdata: [],
-            markers: [[51.505, -0.09]]
+            points: [
+                [-87.6309729, 41.76716449],
+                [-87.63097366, 41.76668286],
+                [-87.63095643, 41.76619789],
+                [-87.63095245, 41.76578],
+                [-87.63094033, 41.76561825]
+            ],
+            zoom: [2],
+            center: [32, 32]
 
         }
     }
 
-    addMarker = (e) => {
-        const {markers} = this.state
-        markers.push(e.latlng)
-        this.setState({markers})
-    }
+    handleClick = (map, ev) => {
+        const { lng, lat } = ev.lngLat;
+        var { mapdata } = this.state;
+        mapdata = [...mapdata, [lng, lat]];
+        const zoom = [map.transform.tileZoom + map.transform.zoomFraction];
+        this.setState({
+            mapdata,
+            zoom,
+            center: map.getCenter()
+        });
+    };
 
     onClick(key, event){
         let data= [["UserName", "PostCount"]]
@@ -60,11 +77,7 @@ export default class PersonList extends React.Component {
     }
 
     componentDidMount() {
-        const s = document.createElement('script');
-        s.type = 'text/javascript';
-        s.async = true;
-        s.innerHTML = "document.write('This is output by document.write()!')";
-        this.instance.appendChild(s);
+
 
         let posts = [];
         let persons = [];
@@ -104,8 +117,14 @@ export default class PersonList extends React.Component {
         });
     }
 
+
+
     render() {
         const {persons} = this.state;
+        const { mapdata, zoom, center } = this.state;
+        const image = new Image(20, 30);
+        image.src = Icon;
+        const images = ["myImage", image];
         const pieOptions = {
             title: "",
             pieHole: 0.6,
@@ -142,70 +161,74 @@ export default class PersonList extends React.Component {
             fontName: "Roboto"
         };
 
+
         return (
-            <div>
-                <div>
+            <div >
+                <div >
                     <Map
-                        center={[51.505, -0.09]}
-                        onClick={this.addMarker}
-                        zoom={13}
+                        style="mapbox://styles/mapbox/streets-v9"
+                        zoom={zoom}
+                        center={center}
+                        containerStyle={{ height: 400, width: 500 }}
+                        onClick={this.handleClick}
                     >
-                        <TileLayer
-                            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                            url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-                        />
-                        {this.state.markers.map((position, idx) =>
-                            <Marker key={`marker-${idx}`} position={position}>
-                                <Popup>
-                                    <span>A pretty CSS3 popup. <br/> Easily customizable.</span>
-                                </Popup>
-                            </Marker>
-                        )}
+                        <Layer
+                            type="symbol"
+                            id="mapdata"
+                            layout={{ "icon-image": "myImage", "icon-allow-overlap": true }}
+                            images={images}
+                        >
+                            {mapdata.map((point, i) => <Feature key={i} coordinates={point} />)}
+                        </Layer>
                     </Map>
                 </div>
-                <Chart
-                    chartType="PieChart"
-                    data={this.state.data}
-                    options={pieOptions}
-                    graph_id="PieChart"
-                    width={"100%"}
-                    height={"400px"}
-                    legend_toggle
-                />
-                <table border="1">
-                    <thead>
-                    <tr>
-                        <th>select</th>
-                        <th>id</th>
-                        <th>name</th>
-                        <th>username</th>
-                        <th>email</th>
-                        <th>address</th>
-                        <th>phone</th>
-                        <th>website</th>
-                        <th>company</th>
+                <div >
+                    <Chart
+                        chartType="PieChart"
+                        data={this.state.data}
+                        options={pieOptions}
+                        graph_id="PieChart"
+                        width={"100%"}
+                        height={"400px"}
+                        legend_toggle
+                    />
+                </div>
+                <div>
+                    <table border="1">
+                        <thead>
+                        <tr>
+                            <th>select</th>
+                            <th>id</th>
+                            <th>name</th>
+                            <th>username</th>
+                            <th>email</th>
+                            <th>address</th>
+                            <th>phone</th>
+                            <th>website</th>
+                            <th>company</th>
 
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {persons && persons.map((persons, key) => {
-                        return (
-                            <tr key={key}>
-                                <td><input type="checkbox" name="" value="" onClick={this.onClick.bind(this,key)}/></td>
-                                <td>{persons.id}</td>
-                                <td>{persons.name}</td>
-                                <td>{persons.username}</td>
-                                <td>{persons.email}</td>
-                                <td>{persons.address.city}</td>
-                                <td>{persons.phone}</td>
-                                <td>{persons.website}</td>
-                                <td>{persons.company.name}</td>
-                            </tr>
-                        )
-                    })}
-                    </tbody>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {persons && persons.map((persons, key) => {
+                            return (
+                                <tr key={key}>
+                                    <td><input type="checkbox" name="" value="" onClick={this.onClick.bind(this,key)}/></td>
+                                    <td>{persons.id}</td>
+                                    <td>{persons.name}</td>
+                                    <td>{persons.username}</td>
+                                    <td>{persons.email}</td>
+                                    <td>{persons.address.city}</td>
+                                    <td>{persons.phone}</td>
+                                    <td>{persons.website}</td>
+                                    <td>{persons.company.name}</td>
+                                </tr>
+                            )
+                        })}
+                        </tbody>
 
-                </table>
+                    </table>
+                </div>
             </div>
 
         )
