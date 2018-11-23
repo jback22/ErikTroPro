@@ -63,14 +63,14 @@ export default class PersonList extends React.Component {
 
             var marker =new mapboxgl.Marker()
                 .setLngLat([
-                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lat,
-                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lng
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lng,
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lat
                 ])
                 .addTo(map);
             map.jumpTo({
                 center: [
-                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lat,
-                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lng
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lng,
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lat
                 ]
             });
 
@@ -150,7 +150,7 @@ export default class PersonList extends React.Component {
 
             width: '100%'
 
-    };
+        };
         const first = {
             width: '450px',
             height: '350px',
@@ -205,53 +205,53 @@ export default class PersonList extends React.Component {
         return (
 
             <div style={container}>
-                    <div id="mapbox-container-1" style={first}></div>
-                    <div style={second}>
-                        <Chart
-                            chartType="PieChart"
-                            data={this.state.data}
-                            options={pieOptions}
-                            graph_id="PieChart"
-                            width={"400px"}
-                            height={"300px"}
-                            legend_toggle
-                        />
-                    </div>
-                   <div>
-                       <table border="1">
-                           <thead>
-                           <tr>
-                               <th>select</th>
-                               <th>id</th>
-                               <th>name</th>
-                               <th>username</th>
-                               <th>email</th>
-                               <th>address</th>
-                               <th>phone</th>
-                               <th>website</th>
-                               <th>company</th>
+                <div id="mapbox-container-1" style={first}></div>
+                <div style={second}>
+                    <Chart
+                        chartType="PieChart"
+                        data={this.state.data}
+                        options={pieOptions}
+                        graph_id="PieChart"
+                        width={"400px"}
+                        height={"300px"}
+                        legend_toggle
+                    />
+                </div>
+                <div>
+                    <table border="1">
+                        <thead>
+                        <tr>
+                            <th>select</th>
+                            <th>id</th>
+                            <th>name</th>
+                            <th>username</th>
+                            <th>email</th>
+                            <th>address</th>
+                            <th>phone</th>
+                            <th>website</th>
+                            <th>company</th>
 
-                           </tr>
-                           </thead>
-                           <tbody>
-                           {persons && persons.map((persons, key) => {
-                               return (
-                                   <tr key={key}>
-                                       <td><input type="checkbox" name="" value="" onClick={this.onClick.bind(this,key)}/></td>
-                                       <td>{persons.id}</td>
-                                       <td>{persons.name}</td>
-                                       <td>{persons.username}</td>
-                                       <td>{persons.email}</td>
-                                       <td>{persons.address.city}</td>
-                                       <td>{persons.phone}</td>
-                                       <td>{persons.website}</td>
-                                       <td>{persons.company.name}</td>
-                                   </tr>
-                               )
-                           })}
-                           </tbody>
-                       </table>
-                   </div>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {persons && persons.map((persons, key) => {
+                            return (
+                                <tr key={key}>
+                                    <td><input type="checkbox" name="" value="" onClick={this.onClick.bind(this,key)}/></td>
+                                    <td>{persons.id}</td>
+                                    <td>{persons.name}</td>
+                                    <td>{persons.username}</td>
+                                    <td>{persons.email}</td>
+                                    <td>{persons.address.city}</td>
+                                    <td>{persons.phone}</td>
+                                    <td>{persons.website}</td>
+                                    <td>{persons.company.name}</td>
+                                </tr>
+                            )
+                        })}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
 
