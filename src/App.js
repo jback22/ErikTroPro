@@ -1,17 +1,18 @@
 import React from 'react';
 import axios from 'axios';
 import 'semantic-ui-css/semantic.min.css';
+import { Grid} from 'semantic-ui-react'
 import _ from "lodash";
 import Chart from "react-google-charts";
-import ReactMapboxGl, { Layer, Feature, ZoomControl } from "react-mapbox-gl";
+import 'mapbox-gl/dist/mapbox-gl.css';
+import mapboxgl from 'mapbox-gl';
+//import ReactMapboxGl, { Layer, Feature, ZoomControl } from "react-mapbox-gl";
 import Icon from "./form.png";
 
 
-const TOKEN="pk.eyJ1IjoiemFmZmEiLCJhIjoiY2pvMGRyZHhwMHR1bTNxbGpuMzMwMWJ5eSJ9.-evEOb2m5B3LftZjo9KziA";
-const Map = ReactMapboxGl({
-    accessToken: "pk.eyJ1IjoiemFmZmEiLCJhIjoiY2pvMGRyZHhwMHR1bTNxbGpuMzMwMWJ5eSJ9.-evEOb2m5B3LftZjo9KziA"
-});
 
+mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
+var map;
 export default class PersonList extends React.Component {
     constructor(props) {
         super(props);
@@ -35,21 +36,10 @@ export default class PersonList extends React.Component {
         }
     }
 
-    handleClick = (map, ev) => {
-        const { lng, lat } = ev.lngLat;
-        var { mapdata } = this.state;
-        mapdata = [...mapdata, [lng, lat]];
-        const zoom = [map.transform.tileZoom + map.transform.zoomFraction];
-        this.setState({
-            mapdata,
-            zoom,
-            center: map.getCenter()
-        });
-    };
 
-    onClick(key, event){
-        let data= [["UserName", "PostCount"]]
-        let mapdata=[["Lat", "Long"]];
+    onClick(key, event) {
+        let data = [["UserName", "PostCount"]]
+        let mapdata = [["Lat", "Long"]];
         let selected = this.state.selected;
 
         if (_.includes(selected, key + 1)) {
@@ -60,19 +50,42 @@ export default class PersonList extends React.Component {
             selected.push(key + 1);
         }
 
-        for(var i=0; i<_.size(selected);i++)
-        {
-            data.push( [_.find(this.state.persons,['id',selected[i]]).name,_.find(this.state.all,['id',selected[i]]).postcount]);
+        for (var i = 0; i < selected.length; i++) {
+            data.push([_.find(this.state.persons, ['id', selected[i]]).name, _.find(this.state.all, ['id', selected[i]]).postcount]);
 
             //burda kişilerin adresinden ülkeleri labellayıp mapdataya atıcam
-            mapdata.push( [_.find(this.state.persons,['id',selected[i]]).address.geo.lat ,_.find(this.state.persons,['id',selected[i]]).address.geo.lng]);
+            mapdata.push([_.find(this.state.persons, ['id', selected[i]]).address.geo.lat, _.find(this.state.persons, ['id', selected[i]]).address.geo.lng]);
             console.log(mapdata);
+
         }
+
+
+        for (var i = 0; i < selected.length; i++) {
+
+            var marker =new mapboxgl.Marker()
+                .setLngLat([
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lng,
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lat
+                ])
+                .addTo(map);
+            map.jumpTo({
+                center: [
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lng,
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lat
+                ]
+            });
+
+
+        }
+
+
+
 
         this.setState({
             selected: [...selected],
             data:[...data]
         })
+
 
     }
 
@@ -97,6 +110,8 @@ export default class PersonList extends React.Component {
 
         });
 
+
+
         Promise.all([promise1, promise2]).then(()=>{
             persons.map(person => {
                 let id = person.id;
@@ -115,6 +130,13 @@ export default class PersonList extends React.Component {
 
             this.setState({all: [...withpost]});
         });
+
+        map = new mapboxgl.Map({
+            container: 'mapbox-container-1', // container id
+            style: 'mapbox://styles/mapbox/streets-v9', // stylesheet location
+            center: [ -37.3159, 81.1496 ], // starting position [lng, lat]
+            zoom: 1// starting zoom
+        });
     }
 
 
@@ -125,9 +147,28 @@ export default class PersonList extends React.Component {
         const image = new Image(20, 30);
         image.src = Icon;
         const images = ["myImage", image];
+        const container = {
+
+            width: '100%'
+
+        };
+        const first = {
+            width: '450px',
+            height: '350px',
+            float:'left',
+            margin:'20px'
+
+
+        };
+        const second = {
+            float:'left',
+            width: 'auto',
+            height: '200px',
+            margin: '100px'
+        };
         const pieOptions = {
-            title: "",
-            pieHole: 0.6,
+            title: "Pie Chart",
+            pieHole: 0.3,
             slices: [{
                 color: "#2BB673"
             },
@@ -163,33 +204,17 @@ export default class PersonList extends React.Component {
 
 
         return (
-            <div >
-                <div >
-                    <Map
-                        style="mapbox://styles/mapbox/streets-v9"
-                        zoom={zoom}
-                        center={center}
-                        containerStyle={{ height: 400, width: 500 }}
-                        onClick={this.handleClick}
-                    >
-                        <Layer
-                            type="symbol"
-                            id="mapdata"
-                            layout={{ "icon-image": "myImage", "icon-allow-overlap": true }}
-                            images={images}
-                        >
-                            {mapdata.map((point, i) => <Feature key={i} coordinates={point} />)}
-                        </Layer>
-                    </Map>
-                </div>
-                <div >
+
+            <div style={container}>
+                <div id="mapbox-container-1" style={first}></div>
+                <div style={second}>
                     <Chart
                         chartType="PieChart"
                         data={this.state.data}
                         options={pieOptions}
                         graph_id="PieChart"
-                        width={"100%"}
-                        height={"400px"}
+                        width={"400px"}
+                        height={"300px"}
                         legend_toggle
                     />
                 </div>
@@ -226,10 +251,10 @@ export default class PersonList extends React.Component {
                             )
                         })}
                         </tbody>
-
                     </table>
                 </div>
             </div>
+
 
         )
     }
