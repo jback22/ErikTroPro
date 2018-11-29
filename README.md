@@ -1,5 +1,13 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Accessing project
+
+### `you can find the project in this domain` 
+
+Runs the app in the this domain.<br>
+Open [http://eriktropro.surge.sh](http://eriktropro.surge.sh) to view it in the browser.
+
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -30,10 +38,6 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 ### `npm run eject`
 
 
-### 'You can find the project in this domain'
-
-Runs the app in the this domain.<br>
-Open [http://eriktropro.surge.sh](http://eriktropro.surge.sh) to view it in the browser.
 
 
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**
