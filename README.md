@@ -7,7 +7,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 Runs the app in the this domain.<br>
 Open [http://eriktropro.surge.sh](http://eriktropro.surge.sh) to view it in the browser.
 
-## About Projects
+## About Project
 
 I was given a project about reactjs.I havent do anything about react before.I start with searching what react does.
 After got something about react I create a default reactjs app.I used Webstorm to do the project.
