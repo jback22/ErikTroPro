@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import 'semantic-ui-css/semantic.min.css';
-import { Grid} from 'semantic-ui-react'
+import { Grid,Table} from 'semantic-ui-react';
 import _ from "lodash";
 import Chart from "react-google-charts";
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -52,10 +52,7 @@ export default class PersonList extends React.Component {
 
         for (var i = 0; i < selected.length; i++) {
             data.push([_.find(this.state.persons, ['id', selected[i]]).name, _.find(this.state.all, ['id', selected[i]]).postcount]);
-
-            //burda kişilerin adresinden ülkeleri labellayıp mapdataya atıcam
             mapdata.push([_.find(this.state.persons, ['id', selected[i]]).address.geo.lat, _.find(this.state.persons, ['id', selected[i]]).address.geo.lng]);
-            console.log(mapdata);
 
         }
 
@@ -219,8 +216,8 @@ export default class PersonList extends React.Component {
                     />
                 </div>
                 <div>
-                    <table border="1">
-                        <thead>
+                    <Table compact celled definition>
+                        <Table.Header>
                         <tr>
                             <th>select</th>
                             <th>id</th>
@@ -233,8 +230,8 @@ export default class PersonList extends React.Component {
                             <th>company</th>
 
                         </tr>
-                        </thead>
-                        <tbody>
+                        </Table.Header>
+                        <Table.Body>
                         {persons && persons.map((persons, key) => {
                             return (
                                 <tr key={key}>
@@ -250,8 +247,8 @@ export default class PersonList extends React.Component {
                                 </tr>
                             )
                         })}
-                        </tbody>
-                    </table>
+                        </Table.Body>
+                    </Table>
                 </div>
             </div>
 

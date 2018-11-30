@@ -7,6 +7,155 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 Runs the app in the this domain.<br>
 Open [http://eriktropro.surge.sh](http://eriktropro.surge.sh) to view it in the browser.
 
+##About Projects
+
+I was given a project about reactjs.I havent do anything about react before.I start with searching what react does.
+After got something about react I create a default reactjs app.I used Webstorm to do the project.
+I was expected to do a web page which includes Map , pie chart and table part.Table shows users informations which are come from an Api.
+Table has a selectbox to choose a user to show it's Post count and Location.I use google-pie-chart for Pie Chart and Mapbox-gl for Map.
+When you choose a user with clicking selectbox its informations goes to piechart and map.
+
+This is my return func in render.Table's code is here.To configure table css I use semantic-ui-react.
+```
+return (
+
+            <div style={container}>
+                <div id="mapbox-container-1" style={first}></div>
+                <div style={second}>
+                    <Chart
+                        chartType="PieChart"
+                        data={this.state.data}
+                        options={pieOptions}
+                        graph_id="PieChart"
+                        width={"400px"}
+                        height={"300px"}
+                        legend_toggle
+                    />
+                </div>
+                <div>
+                    <Table compact celled definition>
+                        <Table.Header>
+                        <tr>
+                            <th>select</th>
+                            <th>id</th>
+                            <th>name</th>
+                            <th>username</th>
+                            <th>email</th>
+                            <th>address</th>
+                            <th>phone</th>
+                            <th>website</th>
+                            <th>company</th>
+
+                        </tr>
+                        </Table.Header>
+                        <Table.Body>
+                        {persons && persons.map((persons, key) => {
+                            return (
+                                <tr key={key}>
+                                    <td><input type="checkbox" name="" value="" onClick={this.onClick.bind(this,key)}/></td>
+                                    <td>{persons.id}</td>
+                                    <td>{persons.name}</td>
+                                    <td>{persons.username}</td>
+                                    <td>{persons.email}</td>
+                                    <td>{persons.address.city}</td>
+                                    <td>{persons.phone}</td>
+                                    <td>{persons.website}</td>
+                                    <td>{persons.company.name}</td>
+                                </tr>
+                            )
+                        })}
+                        </Table.Body>
+                    </Table>
+                </div>
+            </div>
+```
+.map functions allows to use persons list one by one.For a better learn check [here](https://reactjs.org/docs/lists-and-keys.html).
+
+```
+<Table.Body>
+                        {persons && persons.map((persons, key) => {
+                            return (
+```
+
+In my onClick function,I am getting keys from table selectbox and push infos to ```data[]``` ```and mapdata[]``` and use them in piechart and map.
+
+
+```
+onClick(key, event) {
+        let data = [["UserName", "PostCount"]]
+        let mapdata = [["Lat", "Long"]];
+        let selected = this.state.selected;
+
+        if (_.includes(selected, key + 1)) {
+            _.remove(selected, function (n) {
+                return n === (key + 1);
+            });
+        } else {
+            selected.push(key + 1);
+        }
+
+        for (var i = 0; i < selected.length; i++) {
+            data.push([_.find(this.state.persons, ['id', selected[i]]).name, _.find(this.state.all, ['id', selected[i]]).postcount]);
+            mapdata.push([_.find(this.state.persons, ['id', selected[i]]).address.geo.lat, _.find(this.state.persons, ['id', selected[i]]).address.geo.lng]);
+
+        }
+
+
+        for (var i = 0; i < selected.length; i++) {
+
+            var marker =new mapboxgl.Marker()
+                .setLngLat([
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lng,
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lat
+                ])
+                .addTo(map);
+            map.jumpTo({
+                center: [
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lng,
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lat
+                ]
+            });
+
+
+        }
+
+```
+Marker() function add marker to selected user lnglag info on map. 
+
+```
+	var marker =new mapboxgl.Marker()
+                .setLngLat([
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lng,
+                    _.find(this.state.persons, ['id', selected[i]]).address.geo.lat
+                ]) 
+```
+
+I used [axios](https://alligator.io/react/axios-react/) to get data from Api.
+
+```
+componentDidMount() {
+
+
+        let posts = [];
+        let persons = [];
+        let withpost = [];
+
+        var promise1 = axios.get(`https://jsonplaceholder.typicode.com/users`).then(res => {
+            persons = [...res.data];
+            this.setState({
+                persons: [...res.data]
+            });
+        });
+        var promise2 = axios.get(` https://jsonplaceholder.typicode.com/posts`).then(res => {
+            posts = [...res.data];
+            this.setState({
+                posts: [...res.data]
+            });
+
+        });
+
+```
+
 
 ## Available Scripts
 
@@ -36,9 +185,6 @@ Your app is ready to be deployed!
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
 ### `npm run eject`
-
-
-
 
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
